@@ -196,11 +196,97 @@
       </div>
     </section>
 
-    <section class="section container" id="ctb">
-      <div id="hubspot-form-container" style="min-width: 400px;">
-          <!-- HubSpot form will be embedded here -->
+    <section class="section container">
+      <div class="cta-band" id="how">
+        <div>
+          <strong>See it with your data in 30 minutes.</strong>
+          <div class="muted">Upload a CAD model, a BOM CSV, and a PDF — we'll do the rest.</div>
+        </div>
+        <div id="hubspot-form-container" style="min-width: 400px;">
+          <!-- Success message (hidden by default) -->
+          <p id="pv-success" style="display:none; margin:1rem 0; color: var(--brand); font-weight: 600;">Thanks — you're on the list! ✅</p>
+
+          <!-- Honeypot field (invisible to humans) -->
+          <style>.hp-field{position:absolute;left:-9999px;}</style>
+
+          <!-- Hidden iframe to receive the Apps Script response -->
+          <iframe name="pv_iframe" id="pv_iframe" style="display:none;"></iframe>
+
+          <form id="pv-form"
+                action="https://script.google.com/macros/s/AKfycbw2hS9zxiHyMK7SEHQuwhr6uHaE8vfNDc1-V85wTuwxcBjARGfhgHudWL034HWEtykA/exec"
+                method="POST"
+                target="pv_iframe"
+                style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="hp-field">
+              <label>Leave this empty <input name="website"></label>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <label style="display: flex; flex-direction: column; gap: 6px; color: var(--text); font-weight: 500;">
+                Name
+                <input name="name" required 
+                       style="background: #0b1320; border: 1px solid rgba(255,255,255,0.12); color: var(--text); padding: 12px 14px; border-radius: 12px; outline: none; font-size: 14px;"
+                       onfocus="this.style.boxShadow='0 0 0 4px var(--ring)'; this.style.borderColor='var(--brand)'"
+                       onblur="this.style.boxShadow='none'; this.style.borderColor='rgba(255,255,255,0.12)'">
+              </label>
+
+              <label style="display: flex; flex-direction: column; gap: 6px; color: var(--text); font-weight: 500;">
+                Work email
+                <input type="email" name="email" required 
+                       style="background: #0b1320; border: 1px solid rgba(255,255,255,0.12); color: var(--text); padding: 12px 14px; border-radius: 12px; outline: none; font-size: 14px;"
+                       onfocus="this.style.boxShadow='0 0 0 4px var(--ring)'; this.style.borderColor='var(--brand)'"
+                       onblur="this.style.boxShadow='none'; this.style.borderColor='rgba(255,255,255,0.12)'">
+              </label>
+
+              <label style="display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-size: 14px; line-height: 1.4;">
+                <input type="checkbox" name="consent" required 
+                       style="margin-top: 2px; accent-color: var(--brand);">
+                <span>I agree to be contacted and accept the <a href="privacy.html" target="_blank" style="color: var(--brand); text-decoration: underline;">Privacy Policy</a>.</span>
+              </label>
+            </div>
+
+            <!-- Optional: capture page URL -->
+            <input type="hidden" name="page" value="">
+            <button type="submit" 
+                    style="padding: 12px 20px; border-radius: 12px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #00110c; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(0,211,167,0.25); transition: all 0.2s ease;"
+                    onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 14px 40px rgba(0,211,167,0.35)'"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,211,167,0.25)'">
+              Request early access
+            </button>
+          </form>
+        </div>
       </div>
     </section>
+
+  <script>
+    // Fill hidden 'page' field with current URL
+    document.querySelector('input[name="page"]').value = location.href;
+  
+    const ifr = document.getElementById('pv_iframe');
+    const success = document.getElementById('pv-success');
+    const form = document.getElementById('pv-form');
+    const btn = form.querySelector('button[type="submit"]');
+  
+    let awaitingSubmit = false;
+  
+    form.addEventListener('submit', () => {
+      awaitingSubmit = true;
+      success.style.display = 'none';
+      btn.disabled = true;
+      btn.dataset.label = btn.textContent;
+      btn.textContent = 'Submitting…';
+    });
+  
+    ifr.addEventListener('load', () => {
+      // Only act if this load came from a real form POST
+      if (!awaitingSubmit) return;
+      awaitingSubmit = false;
+      success.style.display = 'block';
+      form.reset();
+      btn.disabled = false;
+      btn.textContent = btn.dataset.label || 'Submit';
+    });
+  </script>
 
     <section class="section container" id="cta">
       <div class="preview" style="padding: 20px;">
@@ -220,7 +306,7 @@
     <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap: 12px; flex-wrap: wrap;">
       <div class="muted">© <span id="year"></span> ProductVault. All rights reserved.</div>
       <div style="display:flex; gap:14px;">
-        <a class="muted" href="#">Privacy</a>
+        <a class="muted" href="/privacy">Privacy</a>
         <a class="muted" href="#">Terms</a>
         <a class="muted" href="#">Security</a>
       </div>
